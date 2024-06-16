@@ -3,19 +3,19 @@ from sklearn import linear_model, metrics, model_selection, svm
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, VotingClassifier
 import xgboost as xgb
 from sklearn.ensemble import AdaBoostClassifier, ExtraTreesClassifier
-from sklearn.metrics import accuracy_score
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import SGDClassifier
-import numpy as np
-from matplotlib import pyplot
-from pandas.plotting import scatter_matrix
+# from sklearn.metrics import accuracy_score
+# from sklearn.neighbors import KNeighborsClassifier
+# from sklearn.naive_bayes import GaussianNB
+# from sklearn.tree import DecisionTreeClassifier
+# from sklearn.linear_model import SGDClassifier
+# import numpy as np
+# from matplotlib import pyplot
+# from pandas.plotting import scatter_matrix
 
 names = ['Marital status', 'Application mode', 'Application order', 'Course', 'evening attendance',
-         'Previous qualification', 'Nationality', 'Mother\'s qualification', 'Father\'s qualification',
-         'Mother\'s occupation',
-         'Father\'s occupation', 'Displaced', 'Educational special needs', 'Debtor', 'Tuition fees up to date',
+         'Previous qualification', 'Nationality', 'Mother\'s qualification',
+         'Father\'s qualification', 'Mother\'s occupation', 'Father\'s occupation',
+         'Displaced', 'Educational special needs', 'Debtor', 'Tuition fees up to date',
          'Gender', 'Scholarship holder', 'Age at enrollment', 'International', 'CU 1st sem (enrolled)',
          'CU 1st sem (approved)', 'CU 1st sem (evaluations)', 'CU 1st sem (grade)', 'CU 1st sem (credited)',
          'CU 1st sem (without evaluations)',
@@ -106,7 +106,10 @@ print("Extra Trees predicts:", et_prediction, "and has an accuracy of:", et_mode
 # print("Decision Tree predicts:", dt_prediction, "and has an accuracy of:", dt_model.score(X_test, y_test))
 
 # print out the accuracy of the models
-voting_clf = VotingClassifier(estimators=[('lr', mylog_model), ('rf', myrf_model), ('svm', mysvm_model), ('gbc', mygb_model), ('xgb', myxgb_model), ('ab', ab_model), ('et', et_model)], voting='soft')
+voting_clf = VotingClassifier(estimators=[('lr', mylog_model), ('rf', myrf_model), ('svm', mysvm_model),
+                                          ('gbc', mygb_model), ('xgb', myxgb_model), ('ab', ab_model),
+                                          ('et', et_model)], voting='soft')
 voting_clf.fit(X_train, y_train)
 
-print("Voting Classifier predicts:", voting_clf.predict(dataset), "and has an accuracy of:", voting_clf.score(X_test, y_test))
+print("Voting Classifier predicts:", voting_clf.predict(dataset), "and has an accuracy of:",
+      voting_clf.score(X_test, y_test))
