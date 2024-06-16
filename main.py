@@ -1,11 +1,12 @@
 import pandas as pd
 from sklearn import linear_model, metrics, model_selection, svm
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, VotingClassifier
+import xgboost as xgb
+from sklearn.ensemble import AdaBoostClassifier, ExtraTreesClassifier
+from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.naive_bayes import GaussianNB
-import xgboost as xgb
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import AdaBoostClassifier, ExtraTreesClassifier
 from sklearn.linear_model import SGDClassifier
 import numpy as np
 from matplotlib import pyplot
@@ -25,17 +26,17 @@ names = ['Marital status', 'Application mode', 'Application order', 'Course', 'e
 df = pd.read_csv('data3.csv', names=names)
 
 # create models
-mylog_model = linear_model.LogisticRegression(max_iter=1000)  # linear regression model
+mylog_model = linear_model.LogisticRegression(max_iter=2000)  # linear regression model
 myrf_model = RandomForestClassifier()  # random forest model
-mysvm_model = svm.SVC(kernel='linear')  # support vector machine model
-myknn_model = KNeighborsClassifier()  # KNeighborsClassifier model
+mysvm_model = svm.SVC(kernel='linear', probability=True)  # support vector machine model
 mygb_model = GradientBoostingClassifier()  # GradientBoostingClassifier model
-myxgb_model = xgb.XGBClassifier(max_iter=1000)  # xgboost model
-mygnb_model = GaussianNB()  # GaussianNB model
-dt_model = DecisionTreeClassifier()  # DecisionTreeClassifier model
-ab_model = AdaBoostClassifier()  # AdaBoostClassifier model
+myxgb_model = xgb.XGBClassifier()  # xgboost model
+ab_model = AdaBoostClassifier(algorithm='SAMME')  # AdaBoostClassifier model
 et_model = ExtraTreesClassifier()  # ExtraTreesClassifier model
-sgd_model = SGDClassifier()  # SGDClassifier model
+# myknn_model = KNeighborsClassifier()  # KNeighborsClassifier model
+# dt_model = DecisionTreeClassifier()  # DecisionTreeClassifier model
+# sgd_model = SGDClassifier(loss='modified_huber')  # SGDClassifier model
+# mygnb_model = GaussianNB()  # GaussianNB model
 
 y = df.values[:, 34]
 X = df.values[:, 0:34]
@@ -45,27 +46,27 @@ X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_s
 mylog_model.fit(X_train, y_train)  # linear regression model
 myrf_model.fit(X_train, y_train)  # random forest model
 mysvm_model.fit(X_train, y_train)  # support vector machine model
-myknn_model.fit(X_train, y_train)  # KNeighborsClassifier model
 mygb_model.fit(X_train, y_train)  # GradientBoostingClassifier model
 myxgb_model.fit(X_train, y_train)  # xgboost model
-mygnb_model.fit(X_train, y_train)  # GaussianNB model
-dt_model.fit(X_train, y_train)  # DecisionTreeClassifier model
 ab_model.fit(X_train, y_train)  # AdaBoostClassifier model
 et_model.fit(X_train, y_train)  # ExtraTreesClassifier model
-sgd_model.fit(X_train, y_train)  # SGDClassifier model
+# myknn_model.fit(X_train, y_train)  # KNeighborsClassifier model
+# dt_model.fit(X_train, y_train)  # DecisionTreeClassifier model
+# sgd_model.fit(X_train, y_train)  # SGDClassifier model
+# mygnb_model.fit(X_train, y_train)  # GaussianNB model
 
 # predict the outputs using the test data
 y_pred = mylog_model.predict(X_test)  # linear regression model
 y_pred_rf = myrf_model.predict(X_test)  # random forest model
 y_pred_svm = mysvm_model.predict(X_test)  # support vector machine model
-y_pred_knn = myknn_model.predict(X_test)  # KNeighborsClassifier model
 y_pred_gb = mygb_model.predict(X_test)  # GradientBoostingClassifier model
 y_pred_xgb = myxgb_model.predict(X_test)  # xgboost model
-y_pred_gnb = mygnb_model.predict(X_test)  # GaussianNB model
-y_pred_dt = dt_model.predict(X_test)  # DecisionTreeClassifier model
 y_pred_ab = ab_model.predict(X_test)  # AdaBoostClassifier model
 y_pred_et = et_model.predict(X_test)  # ExtraTreesClassifier model
-y_pred_sgd = sgd_model.predict(X_test)  # SGDClassifier model
+# y_pred_sgd = sgd_model.predict(X_test)  # SGDClassifier model
+# y_pred_knn = myknn_model.predict(X_test)  # KNeighborsClassifier model
+# y_pred_gnb = mygnb_model.predict(X_test)  # GaussianNB model
+# y_pred_dt = dt_model.predict(X_test)  # DecisionTreeClassifier model
 
 # print out  the prediction of the same output for all the models
 dataset = [
@@ -76,14 +77,14 @@ dataset = [
 linear_prediction = mylog_model.predict(dataset)
 random_forest_prediction = myrf_model.predict(dataset)
 svm_prediction = mysvm_model.predict(dataset)
-knn_prediction = myknn_model.predict(dataset)
 gbc_prediction = mygb_model.predict(dataset)
 xgboost_prediction = myxgb_model.predict(dataset)
-gnb_prediction = mygnb_model.predict(dataset)
-dt_prediction = dt_model.predict(dataset)
 ab_prediction = ab_model.predict(dataset)
 et_prediction = et_model.predict(dataset)
-sgd_prediction = sgd_model.predict(dataset)
+# sgd_prediction = sgd_model.predict(dataset)
+# knn_prediction = myknn_model.predict(dataset)
+# gnb_prediction = mygnb_model.predict(dataset)
+# dt_prediction = dt_model.predict(dataset)
 
 print("linear regression predicts:", linear_prediction, "and has an accuracy of:",
       mylog_model.score(X_test, y_test))
@@ -91,48 +92,21 @@ print("random forest predicts:", random_forest_prediction, "and has an accuracy 
       myrf_model.score(X_test, y_test))
 print("support vector machine predicts:", svm_prediction, "and has an accuracy of:",
       mysvm_model.score(X_test, y_test))
-print("KNeighborsClassifier predicts:", knn_prediction, "and has an accuracy of:",
-      myknn_model.score(X_test, y_test))
 print("GradientBoostingClassifier predicts:", gbc_prediction, "and has an accuracy of:",
       mygb_model.score(X_test, y_test))
 print("xgboost predicts:", xgboost_prediction, "and has an accuracy of:", myxgb_model.score(X_test, y_test))
-print("GaussianNB predicts:", gnb_prediction, "and has an accuracy of:",
-      mygnb_model.score(X_test, y_test))
-print("Decision Tree predicts:", dt_prediction, "and has an accuracy of:", dt_model.score(X_test, y_test))
 print("AdaBoost predicts:", ab_prediction, "and has an accuracy of:", ab_model.score(X_test, y_test))
 print("Extra Trees predicts:", et_prediction, "and has an accuracy of:", et_model.score(X_test, y_test))
-print("Stochastic Gradient Descent predicts:", sgd_prediction, "and has an accuracy of:",
-      sgd_model.score(X_test, y_test))
+# print("Stochastic Gradient Descent predicts:", sgd_prediction, "and has an accuracy of:",
+#       sgd_model.score(X_test, y_test))
+# print("KNeighborsClassifier predicts:", knn_prediction, "and has an accuracy of:",
+#       myknn_model.score(X_test, y_test))
+# print("GaussianNB predicts:", gnb_prediction, "and has an accuracy of:",
+#       mygnb_model.score(X_test, y_test))
+# print("Decision Tree predicts:", dt_prediction, "and has an accuracy of:", dt_model.score(X_test, y_test))
 
-# make an array of the predictions
-predictions = [linear_prediction, random_forest_prediction, svm_prediction, knn_prediction, gbc_prediction,
-               xgboost_prediction, gnb_prediction, dt_prediction, ab_prediction, et_prediction, sgd_prediction]
+# print out the accuracy of the models
+voting_clf = VotingClassifier(estimators=[('lr', mylog_model), ('rf', myrf_model), ('svm', mysvm_model), ('gbc', mygb_model), ('xgb', myxgb_model), ('ab', ab_model), ('et', et_model)], voting='soft')
+voting_clf.fit(X_train, y_train)
 
-# count the number of times all the models predicted the same output using the dataset
-output0 = 0
-output1 = 0
-output2 = 0
-
-for i in predictions:
-    if i == 0:
-        output0 += 1
-    elif i == 1:
-        output1 += 1
-    else:
-        output2 += 1
-
-print("output 0:", output0)
-print("output 1:", output1)
-print("output 2:", output2)
-
-# print the output with the most predictions
-if output0 > output1 and output0 > output2:
-    print("The output is 0")
-elif output1 > output0 and output1 > output2:
-    print("The output is 1")
-else:
-    print("The output is 2")
-
-# print(df['Output'].value_counts())
-# print(y)
-# print(df.columns)
+print("Voting Classifier predicts:", voting_clf.predict(dataset), "and has an accuracy of:", voting_clf.score(X_test, y_test))
