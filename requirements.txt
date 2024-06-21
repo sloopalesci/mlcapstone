@@ -1,0 +1,10 @@
+notebook 
+voila 
+pandas 
+seaborn 
+scikit-learn 
+matplotlib 
+numpy
+xgboost
+libomp
+ipywidgets
