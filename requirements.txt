@@ -5,3 +5,5 @@ seaborn==0.13.2
 xgboost==2.1.0
 voila==0.5.7
 notebook==7.2.1
+IPython==8.1.1
+ipykernel==6.7.0
